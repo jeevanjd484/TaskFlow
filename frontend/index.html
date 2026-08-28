@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow - Task Manager</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 40px 20px;
+            color: #222;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: auto;
+        }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        /* STATS */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 22px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card h3 {
+            font-size: 30px;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* ADD TASK */
+        .add-task {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .add-task h2 {
+            margin-bottom: 18px;
+            color: #333;
+        }
+
+        .form {
+            display: flex;
+            gap: 12px;
+        }
+
+        .form input {
+            flex: 1;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .form input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+
+        .add-btn {
+            padding: 14px 22px;
+            border: none;
+            border-radius: 10px;
+            background: #667eea;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .add-btn:hover {
+            background: #5568d8;
+            transform: translateY(-1px);
+        }
+
+        /* TASK SECTION */
+        .task-section {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 25px;
+            border-radius: 20px;
+        }
+
+        .task-section h2 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        /* TASK CARD */
+        .task-card {
+            background: white;
+            padding: 22px;
+            margin-bottom: 16px;
+            border-radius: 15px;
+            box-shadow: 0 7px 18px rgba(0, 0, 0, 0.12);
+            transition: 0.2s;
+        }
+
+        .task-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18);
+        }
+
+        .task-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .task-card h3 {
+            font-size: 21px;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .task-card p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        /* STATUS */
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .completed {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .pending {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        /* BUTTONS */
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .complete-btn,
+        .delete-btn {
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .complete-btn {
+            background: #10b981;
+        }
+
+        .complete-btn:hover {
+            background: #059669;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+
+        /* EMPTY MESSAGE */
+        .empty {
+            background: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 15px;
+            color: #777;
+        }
+
+        /* MOBILE */
+        @media (max-width: 700px) {
+
+            body {
+                padding: 25px 12px;
+            }
+
+            .header h1 {
+                font-size: 38px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .form {
+                flex-direction: column;
+            }
+
+            .add-btn {
+                width: 100%;
+            }
+
+            .task-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .buttons {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="header">
+            <h1>TaskFlow</h1>
+            <p>Organize your work. Complete your goals.</p>
+        </div>
+
+        <!-- STATISTICS -->
+        <div class="stats">
+
+            <div class="stat-card">
+                <h3 id="totalTasks">0</h3>
+                <p>Total Tasks</p>
+            </div>
+
+            <div class="stat-card">
+                <h3 id="completedTasks">0</h3>
+                <p>Completed</p>
+            </div>
+
+            <div class="stat-card">
+                <h3 id="pendingTasks">0</h3>
+                <p>Pending</p>
+            </div>
+
+        </div>
+
+        <!-- ADD TASK -->
+        <div class="add-task">
+
+            <h2>Add New Task</h2>
+
+            <div class="form">
+
+                <input
+                    type="text"
+                    id="title"
+                    placeholder="Task title"
+                >
+
+                <input
+                    type="text"
+                    id="description"
+                    placeholder="Task description"
+                >
+
+                <button class="add-btn" onclick="addTask()">
+                    + Add Task
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- TASKS -->
+        <div class="task-section">
+
+            <h2>My Tasks</h2>
+
+            <div id="tasks"></div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const API_URL = "http://localhost:5000/api/tasks";
+
+
+        // LOAD ALL TASKS
+        async function loadTasks() {
+
+            const response = await fetch(API_URL);
+            const tasks = await response.json();
+
+            const tasksDiv = document.getElementById("tasks");
+
+            tasksDiv.innerHTML = "";
+
+
+            // UPDATE STATISTICS
+
+            const total = tasks.length;
+
+            const completed = tasks.filter(
+                task => task.completed
+            ).length;
+
+            const pending = total - completed;
+
+
+            document.getElementById("totalTasks").textContent = total;
+
+            document.getElementById("completedTasks").textContent = completed;
+
+            document.getElementById("pendingTasks").textContent = pending;
+
+
+            // NO TASKS
+
+            if (tasks.length === 0) {
+
+                tasksDiv.innerHTML = `
+                    <div class="empty">
+                        <h3>No tasks yet 🚀</h3>
+                        <p>Add your first task above.</p>
+                    </div>
+                `;
+
+                return;
+            }
+
+
+            // DISPLAY TASKS
+
+            tasks.forEach(task => {
+
+                tasksDiv.innerHTML += `
+
+                    <div class="task-card">
+
+                        <div class="task-top">
+
+                            <div>
+
+                                <h3>
+                                    ${task.title}
+                                </h3>
+
+                                <p>
+                                    ${task.description}
+                                </p>
+
+                            </div>
+
+
+                            <span class="status ${
+                                task.completed
+                                    ? "completed"
+                                    : "pending"
+                            }">
+
+                                ${
+                                    task.completed
+                                        ? "✓ COMPLETED"
+                                        : "● PENDING"
+                                }
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="buttons">
+
+                            ${
+                                !task.completed
+                                    ? `
+                                    <button
+                                        class="complete-btn"
+                                        onclick="completeTask('${task._id}')"
+                                    >
+                                        ✓ Complete
+                                    </button>
+                                    `
+                                    : ""
+                            }
+
+
+                            <button
+                                class="delete-btn"
+                                onclick="deleteTask('${task._id}')"
+                            >
+                                🗑 Delete
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            });
+
+        }
+
+
+        // COMPLETE TASK
+        async function completeTask(id) {
+
+            await fetch(`${API_URL}/${id}`, {
+
+                method: "PUT",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    completed: true
+                })
+
+            });
+
+            loadTasks();
+
+        }
+
+
+        // DELETE TASK
+        async function deleteTask(id) {
+
+            await fetch(`${API_URL}/${id}`, {
+
+                method: "DELETE"
+
+            });
+
+            loadTasks();
+
+        }
+
+
+        // ADD TASK
+        async function addTask() {
+
+            const title =
+                document.getElementById("title").value;
+
+            const description =
+                document.getElementById("description").value;
+
+
+            if (!title || !description) {
+
+                alert("Please enter both title and description.");
+
+                return;
+            }
+
+
+            await fetch(API_URL, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    title: title,
+
+                    description: description
+
+                })
+
+            });
+
+
+            // CLEAR INPUTS
+
+            document.getElementById("title").value = "";
+
+            document.getElementById("description").value = "";
+
+
+            // RELOAD TASKS
+
+            loadTasks();
+
+        }
+
+
+        // LOAD TASKS WHEN PAGE OPENS
+        loadTasks();
+
+    </script>
+
+</body>
+</html>
